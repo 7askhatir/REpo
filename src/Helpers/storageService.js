@@ -6,7 +6,7 @@ export  const dataService = {
     setData: (b,upe,lp,up,p,
               bm,upem,lpm,upm,pm) =>
                    subject.next({ balance: b ,usdtPending:upe,LastPaid:lp,usdtPaid:up,position:p,
-              balanceSlm:bm ,usdtPendingSlm:upem,lastPaidM:lpm,usdPaidM:upm,position:pm}),
+              balanceSlm:bm ,usdtPendingSlm:upem,lastPaidM:lpm,usdPaidM:upm,positionM:pm}),
     clearData: () => subject.next(),
     getData: () => subject.asObservable()
 };

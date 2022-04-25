@@ -16,44 +16,41 @@ export class Dashbord extends Component {
 
 	toutaleSuplay = 1000000;
 	constructor(props) {
-		let balance = 0;
-	 
-		let usdtPending = 0;
-		let LastPaid = 0;
-		let address = 0;
-		let balanceM = 0;
-
-
+		let balance = 0;let balanceSlm=0;
+		let usdtPending = 0; let usdtPendingSlm = 0;
+		let LastPaid = 0; let LastPaidSlm = 0;
+		let address = 0; let UsdtPaidSlm = 0;
+		let balanceM = 0; let PositionSlm = 0;
+		let UsdtPaid = 0;
+		let Position = 0;
 		if (Number(localStorage.getItem("Balance_error")) == -1 && localStorage.getItem("connect_by_wallet") != "true") {
 			localStorage.removeItem("Balance_error")
 		}
-
-
-
 		//  localStorage.removeItem("Balance_error")
 		if (localStorage.getItem("Balance") != null && localStorage.getItem("input") == null) {
 			balance = localStorage.getItem("Balance");
 			balanceM = localStorage.getItem("BalanceM");
 			usdtPending = localStorage.getItem("USDT_pendings_exact");
 			LastPaid = localStorage.getItem("lastPAY");
+			UsdtPaid = localStorage.getItem("USDT_pendings")
+			Position =localStorage.getItem("position")
+		}
+		if(localStorage.getItem("connect_by_wallet") == "true"){
+			balanceSlm=localStorage.getItem("balanceSLM");
+			usdtPendingSlm = localStorage.getItem("PendingSLM");
+			LastPaidSlm = localStorage.getItem("LastPaidSLM");
+			UsdtPaidSlm = localStorage.getItem("PaidSLM");
+			PositionSlm = localStorage.getItem("PositionSLM");
 		}
 		super(props);
 		this.getTotalPaidUSDT()
 		this.getHolders_getting_rewards()
-		
-
 		this.getTotalPaidUSDTM()
 		this.getHolders_getting_rewardsM()
 		this.getBalance_PinkLock_SLR()
 		this.getBalance_PinkLock_SLRM()
-		
 		this.getBalance_Liquidity_SLR()
 		this.getBalance_Liquidity_SLRM()
-		
-		
-
-
-
 		this.getpricedata();
 		this.getpricedataM();
 		this.getTransactions();
@@ -65,7 +62,7 @@ export class Dashbord extends Component {
 		this.getTotalVolumeOld();
 		this.state = {
 			SalaryBalance: balance,
-			USDTPaid: "0.00",
+			USDTPaid: UsdtPaid,
 			PendingUSDT: usdtPending,
 			TotalUSDTHoldersOld: "0.00",
 			TotalUSDTHoldersNew: "0.00",
@@ -76,13 +73,11 @@ export class Dashbord extends Component {
 			TotalTradingVolumeTABLE: [],
 			SlaryPrice: "0.00",
 			address: address,
-			position: "0",
+			position: Position,
 			LastPayout: LastPaid,
-
-			SalaryBalanceM: balanceM,
-			USDTPaidM: "0.00",
-			PendingUSDTM: usdtPending,
-			// TotalUSDTHoldersOldM: "0.00",
+			SalaryBalanceM: balanceSlm,
+			USDTPaidM: UsdtPaidSlm,
+			PendingUSDTM: usdtPendingSlm,
 			TotalUSDTHoldersNewM: "0.00",
 			DailyTradingVolumeM: "0.00",
 			Current0riceM: "0.00",
@@ -90,19 +85,13 @@ export class Dashbord extends Component {
 			TotalTradingVolumeM: [],
 			TotalTradingVolumeTABLEM: [],
 			SlaryPriceM: "0.00",
-			// addressM: address,
-			positionM: "0",
-			LastPayoutM: LastPaid,
+			positionM: PositionSlm,
+			LastPayoutM: LastPaidSlm,
 			matches: window.matchMedia("(min-width: 991px)").matches,
-
-
-
 			SalaryBalanceOnPinkLock : '',
 			SalaryMiningBalanceOnPinkLock : '',
 			SalaryBalanceOnLiquidity : '',
 			SalaryMiningBalanceOnLiquidity : '',
-
-
 		}
 
 
@@ -1175,7 +1164,7 @@ export class Dashbord extends Component {
 		 		PendingUSDTM: message.usdtPendingSlm,
 		 		LastPayoutM: message.lastPaidM,
 				USDTPaidM:message.usdPaidM,
-		     	positionM: message.position
+		     	positionM: message.positionM
 			})
 		});
 		// dataService_SLRM.getData().subscribe(m => {
@@ -1234,8 +1223,6 @@ export class Dashbord extends Component {
 			datasets: [
 				{
 
-
-
 					data: DataM,
 					fill: true,
 					backgroundColor: "rgba(75,192,192,0.2)",
@@ -1243,10 +1230,6 @@ export class Dashbord extends Component {
 				},
 
 			]
-
-
-
-
 		};
 		var gainConfig = {
 			plugins: {

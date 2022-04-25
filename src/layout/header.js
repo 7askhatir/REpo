@@ -190,18 +190,17 @@ const Header = () => {
 		TotalPaidUSDT = await getTotalPaidUSDT();
 
 		let USDT_pendingsM = await gerUserUSDT_PAIDM(address);
+	    
 	
 	
 	
-	
-			let tokenBalanceM = await gerUserTokenBalanceM(address);
-			console.log(tokenBalanceM);
+		let tokenBalanceM = await gerUserTokenBalanceM(address);
+		console.log(tokenBalanceM);
 
 		setbalance_(tokenBalance);
 	 
-
-        dataService.setData(tokenBalance,USDT_pendings.pendingUSDT,USDT_pendings.lastPAY,USDT_pendings.paidUSDT,USDT_pendings.position,
-			tokenBalanceM,USDT_pendingsM.pendingUSDT,USDT_pendingsM.lastPAY,USDT_pendingsM.paidUSDT,USDT_pendingsM.position);
+        dataService.setData(tokenBalance,USDT_pendings.paidUSDT,USDT_pendings.lastPAY,USDT_pendings.pendingUSDT,USDT_pendings.position,
+		tokenBalanceM,USDT_pendingsM.pendingUSDT,USDT_pendingsM.lastPAY,USDT_pendingsM.paidUSDT,USDT_pendingsM.position);
 		setUSDT_pendings_(USDT_pendings.paidUSDT);
 		setpaidUSDT_(USDT_pendings.pendingUSDT);
 
@@ -213,8 +212,8 @@ const Header = () => {
 		setPosition(USDT_pendings.position);
 	    setLastPAY(USDT_pendings.lastPAY);
 
-	localStorage.setItem('position', USDT_pendings.position);
-	localStorage.setItem('lastPAY', USDT_pendings.lastPAY);
+	    localStorage.setItem('position', USDT_pendings.position);
+	    localStorage.setItem('lastPAY', USDT_pendings.lastPAY);
 
 
 	if(tokenBalance < 10 ){
@@ -225,15 +224,19 @@ const Header = () => {
 	localStorage.setItem('connect_by_wallet',"true");
 		address_local = address;
 		localStorage.setItem('Balance', tokenBalance);
-		localStorage.setItem('USDT_paid', USDT_paid);
-		localStorage.setItem('USDT_pendings', USDT_pendings.paidUSDT);
-		localStorage.setItem('USDT_pendings_exact', USDT_pendings.pendingUSDT);
+		localStorage.setItem('USDT_paid', USDT_paid);	
+		localStorage.setItem('USDT_pendings', USDT_pendings.pendingUSDT);
+		localStorage.setItem('USDT_pendings_exact',USDT_pendings.paidUSDT );
 		localStorage.setItem('address', address);
 		localStorage.removeItem("input")
 		let date1 = new Date();
 		localStorage.setItem('date1', date1);	
 		localStorage.setItem('USDT_pendingsM', USDT_pendingsM.paidUSDT);
-
+		localStorage.setItem('balanceSLM',tokenBalanceM)
+        localStorage.setItem('PaidSLM',USDT_pendingsM.paidUSDT)
+		localStorage.setItem('LastPaidSLM',USDT_pendingsM.lastPAY)
+		localStorage.setItem('PendingSLM',USDT_pendingsM.pendingUSDT)
+		localStorage.setItem('PositionSLM',USDT_pendingsM.position)
 	};
 
 
