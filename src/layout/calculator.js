@@ -972,14 +972,14 @@ Liquidity wallet is locked and excluded. 123125 SLR */}
 			{/* <div class="card-header text-uppercase">By reinvesting your USDT rewards </div> */}
 			<div class="card-content">
 				<div class="row row-group m-0">
-					<div class="col-12 col-md-4 col-lg-6 col-xl-6">
+					<div class="col-12 col-md-6 col-lg-6 col-xl-6">
 						<div class="card-body text-center px-0">
 						<input type="number" className={className_price_input+' form-control'}  onChange={this.checkEventPrice } placeholder={this.state.hnt_usd} class="form-control hide" />
 							<h4   className={className_price}  >$  {((this.state.DailyTradingVolumeM *this.state.SlaryPriceM*0.2)+((this.state.hnt_gain)*0.85*(this.PRICE*0.9))).toFixed(3)}</h4><h6></h6>
 							<p class="mb-0"> Total Rewards per month </p>
 						</div>
 					</div>
-					<div class="col-12 col-md-4 col-lg-6 col-xl-6">
+					<div class="col-12 col-md-6 col-lg-6 col-xl-6">
 						<div class="card-body text-center px-0">
 						<input type="number"  className={className_Mined_iput+' form-control'} onChange={this.checkEventMined } placeholder={this.state.mined}     />
 							<h4     className={className_mined}   >$ {((this.state.DailyTradingVolumeM *this.state.SlaryPriceM*0.2*(this.state.holdSLM))+((this.state.hnt_gain)*0.85*(this.PRICE*0.9)*(this.state.holdSLM))).toFixed(3)}</h4>
@@ -994,9 +994,6 @@ Liquidity wallet is locked and excluded. 123125 SLR */}
 		</div>
 	</div>
 </div>
-
-
-
                     <div class="overlay toggle-menu"></div>
 
                 </div>
