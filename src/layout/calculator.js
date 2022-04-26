@@ -4,9 +4,6 @@ import ReactTooltip from "react-tooltip";
 
 
 	var HNT_PRICE=19.65;
-
- 
-	
 	const spots = 100;
 	const mined = 0;
 	const totale_rewards = 0;
@@ -19,14 +16,15 @@ const price_click = false;
 export class Calculator extends Component {  
 	
     toutaleSuplay=726875;
+	toutaleSuplaySLM=14424371.64
 	dailyVolum=1000;
 	Balance=1000;
 	PRICE=1;
+	BalanceSLM=1000;
+
 
 
 	 mined_for_one_spote = 7.5;
-
-
 	constructor (props) {
 		super(props);
 		this.state = {
@@ -45,12 +43,20 @@ export class Calculator extends Component {
 			price_click : false,
 			minted_click : false,
 			spots_click : false,
+			DailyTradingVolumeM: "0.00",
+			SlaryPriceM: "0.00",
+			holdSLM:"0.00",
+
            
 		};
 		this.getpricedata();
 		this.getVolume();
 	//	 this.checkEvent_init();
 		 this.componentDidMount()
+		 this.getVolumeM();
+		 this.getpricedataM();
+		 
+
 
 
 
@@ -92,9 +98,129 @@ this.handleClick_pointer_spots(true);
 
 
 	  }
+
+	  getpricedataM() {
+		const query = `
+        {
+            ethereum(network: bsc) {
+              dexTrades(
+                options: {desc: ["block.height", "tradeIndex"], limit: 1, offset: 0}
+                baseCurrency: {is: "0x15ada4ea653e6e87b7f981c943965b20b2dcf703"}
+              ) {
+                block {
+                  height
+                }
+                tradeIndex     
+                baseAmount
+                tradeAmount(in: USD)
+              }
+            }
+          }
+          
+        `;
+
+
+
+		const url = "https://graphql.bitquery.io/";
+		const opts = {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				"X-API-KEY": "BQYNebMBV72Av20gOE4ajX0ebCCe53xT"
+			},
+			body: JSON.stringify({
+				query
+			})
+		};
+		fetch(url, opts)
+			.then(res => res.json())
+			.then((data) => {
+				console.log(data)
+				var price = 0;
+				data.data.ethereum.dexTrades.map((e) => {
+					price = e.tradeAmount / e.baseAmount;
+				}
+				)
+				this.setState({
+					SlaryPriceM: price
+				});
+			})
+			.catch(console.error)
+	}
 	  
 
+	  getVolumeM() {
+		const query = `
+		query ($network: EthereumNetwork!, $dateFormat: String!, $token: String!, $from: ISO8601DateTime, $till: ISO8601DateTime) {
+			ethereum(network: $network) {
+			  dexTrades(
+				options: {asc: "date.date"}
+				date: {since: $from, till: $till}
+				baseCurrency: {is: $token}
+			  ) {
+				date: date {
+				  date(format: $dateFormat)
+				}
+				trades: countBigInt
+				amount: baseAmount
+				baseCurrency {
+				  symbol
+				}
+				contracts: countBigInt(uniq: smart_contracts)
+				currencies: countBigInt(uniq: quote_currency)
+			  }
+			}
+		  }
+		  
+		`;
 
+		const variables = {
+
+			"offset": 0,
+			"network": "bsc",
+			"token": "0x15ada4ea653e6e87b7f981c943965b20b2dcf703",
+
+			"dateFormat": "%Y-%m-%d"
+		};
+
+		const url = "https://graphql.bitquery.io/";
+		const opts = {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				"X-API-KEY": "BQYNebMBV72Av20gOE4ajX0ebCCe53xT"
+			},
+			body: JSON.stringify({
+				query, variables
+			})
+		};
+
+
+		fetch(url, opts)
+			.then(res => res.json())
+			.then((data) => {
+
+
+				console.log(data.data.ethereum.dexTrades);
+				
+				this.setState({
+					DailyTradingVolumeM: data.data.ethereum.dexTrades[data.data.ethereum.dexTrades.length - 1].amount,
+				})
+
+				setTimeout(() => {
+					this.setState({
+
+						TotalTradingVolumeTABLEM: (data.data.ethereum.dexTrades),
+
+					});
+					console.log(this.state.TotalTradingVolumeTABLEM)
+				}, 1000);
+				// setListChart(data.data.ethereum.dexTrades);
+
+			})
+			.catch(console.error);
+
+	}
 
 
 
@@ -310,6 +436,25 @@ this.handleClick_pointer_spots(true);
 			balanceYear:balanceYear
 	   });
     };
+
+	ChangeBalanceSLM = (event)=>{
+		const yourSalaryMaining = event.target.value;
+		this.BalanceSLM = event.target.value;
+		console.log(yourSalaryMaining);
+		var  hold=parseInt(yourSalaryMaining)*100/(this.toutaleSuplaySLM);
+		if(yourSalaryMaining<=0) hold=0;
+	// 	var rewardWeek=(((this.dailyVolum * 0.08 )* Number(hold) / 100)*7).toFixed(3);
+	// 	var rewardMonth=(((this.dailyVolum * 0.08 )* Number(hold) / 100)*30).toFixed(3);
+	// 	var rewardYear = (((this.dailyVolum * 0.08 )* Number(hold) / 100)*365.25).toFixed(3);
+	// 	var balanceWeek = ((rewardWeek/this.PRICE) + Number(yourSalary) ).toFixed(3);
+    //     var balanceMonth = (rewardMonth/this.PRICE  + Number(yourSalary)).toFixed(3) ;
+    //     var balanceYear = (rewardYear/this.PRICE + Number(yourSalary) ).toFixed(3);
+	// 	console.log(yourSalary);
+		this.setState({
+			holdSLM: hold,
+
+	   });
+    };
 	
 	checkEventVolum = (event)=>{
 		this.dailyVolum = event.target.value;
@@ -333,6 +478,13 @@ this.handleClick_pointer_spots(true);
 	   });
     };
 
+	ChangeVolumeSlm=(event)=>{
+		let dailyVolumSlm = event.target.value;
+
+		this.setState({
+			DailyTradingVolumeM:dailyVolumSlm/this.state.SlaryPriceM
+		})
+	}
 
 
 
@@ -727,6 +879,123 @@ Liquidity wallet is locked and excluded. 123125 SLR */}
 		</div>
 	</div>
 </div>
+<div class="card">
+	<div class="card-header text-uppercase text-left">SALARY Mainig Rewards Calculator</div>
+	<div class="card-body">
+		<form>
+			<div class="row">
+			
+				<div class="col-12 col-lg-6 col-xl-6">
+					<div class="form-group row">
+						<label class="col-sm-4 col-form-label"  >Your Salary Maining*</label>
+						<div class="col-sm-8">
+							<input type="number"  onChange={this.ChangeBalanceSLM } placeholder="1000" class="form-control" />
+						</div>
+					</div>
+				</div>
+				<div class="col-12 col-lg-6 col-xl-6">
+					<div class="form-group row">
+						<label class="col-sm-4 col-form-label">Daily volume*</label>
+						<div class="col-sm-8">
+							<input type="text" onChange={this.ChangeVolumeSlm } placeholder={(this.state.DailyTradingVolumeM *this.state.SlaryPriceM).toFixed(3)}	       class="form-control"  />
+						</div>
+					</div>
+				</div>
+				<div class="col-12 col-lg-6 col-xl-6">
+					<div class="form-group row">
+						<label class="col-sm-4 col-form-label">Circulating Supply <i data-tip data-for="addTip2" class="fa fa-info-circle"></i></label>
+						<ReactTooltip id="addTip2" place="top" effect="solid">
+						CEX & Staking wallet is locked and excluded : 150000 SLR<br></br>
+                        Liquidity wallet is locked and excluded : 123125 SLR
+      </ReactTooltip>
+						<div class="col-sm-4">
+							<input type="text" disabled="disabled"  class="form-control" value={this.toutaleSuplaySLM.toFixed(3)} />
+						</div>
+						<div class="col-sm-4">
+							<input type="text" disabled="disabled"   class="form-control" value={"Holding: "+Number(this.state.holdSLM).toFixed(3)+"%"}/>
+						</div>
+					</div>
+				</div>
+				  <div class="col-12 col-lg-6 col-xl-6">
+					<div class="form-group row">
+					<label class="col-sm-4 col-form-label">REWARDS IN %</label>
+						<div class="col-sm-8">
+							<input type="text" disabled="disabled"  class="form-control" value="2%" />
+						</div>
+					</div>
+				</div>  
+				
+				 
+			</div>
+		</form>
+	</div>
+</div>
+<div class="row">
+	<div class="col-12 col-lg-12 col-xl-12">
+		
+		<div class="card">
+			{/* <div class="card-header text-uppercase">By reinvesting your USDT rewards </div> */}
+			<div class="card-content">
+				<div class="row row-group m-0">
+					<div class="col-12 col-md-4 col-lg-4 col-xl-4">
+						<div class="card-body text-center px-0">
+						<input type="number" className={className_price_input+' form-control'}  onChange={this.checkEventPrice } placeholder={this.state.hnt_usd} class="form-control hide" />
+							<h4   className={className_price}  >$  {(this.state.DailyTradingVolumeM *this.state.SlaryPriceM).toFixed(3)}</h4><h6></h6>
+							<p class="mb-0"> DAILY VOLUME </p>
+						</div>
+					</div>
+					<div class="col-12 col-md-4 col-lg-4 col-xl-4">
+						<div class="card-body text-center px-0">
+						<input type="number"  className={className_Mined_iput+' form-control'} onChange={this.checkEventMined } placeholder={this.state.mined}     />
+							<h4     className={className_mined}   >$ {((this.state.DailyTradingVolumeM *this.state.SlaryPriceM*0.02).toFixed(3) )}</h4>
+							<p class="mb-0">DAILY VOLUME REWARDS</p>
+						</div>
+					</div>
+					<div class="col-12 col-md-4 col-lg-4 col-xl-4">
+						<div class="card-body text-center px-0">
+							<h4 class="mb-0">$ {((this.state.hnt_gain)*0.85*(this.PRICE*0.9)).toFixed(3)}</h4><h6></h6>
+							<p class="mb-0">MINING FARM REWARDS</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			{/* <div class="card-footer text-center">
+				Estimations are based on the current Salary price $ {this.PRICE}
+			</div> */}
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-12 col-lg-12 col-xl-12">
+		
+		<div class="card">
+			{/* <div class="card-header text-uppercase">By reinvesting your USDT rewards </div> */}
+			<div class="card-content">
+				<div class="row row-group m-0">
+					<div class="col-12 col-md-4 col-lg-6 col-xl-6">
+						<div class="card-body text-center px-0">
+						<input type="number" className={className_price_input+' form-control'}  onChange={this.checkEventPrice } placeholder={this.state.hnt_usd} class="form-control hide" />
+							<h4   className={className_price}  >$  {((this.state.DailyTradingVolumeM *this.state.SlaryPriceM*0.2)+((this.state.hnt_gain)*0.85*(this.PRICE*0.9))).toFixed(3)}</h4><h6></h6>
+							<p class="mb-0"> Total Rewards per month </p>
+						</div>
+					</div>
+					<div class="col-12 col-md-4 col-lg-6 col-xl-6">
+						<div class="card-body text-center px-0">
+						<input type="number"  className={className_Mined_iput+' form-control'} onChange={this.checkEventMined } placeholder={this.state.mined}     />
+							<h4     className={className_mined}   >$ {((this.state.DailyTradingVolumeM *this.state.SlaryPriceM*0.2*(this.state.holdSLM))+((this.state.hnt_gain)*0.85*(this.PRICE*0.9)*(this.state.holdSLM))).toFixed(3)}</h4>
+							<p class="mb-0">Your Rewards per month</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			{/* <div class="card-footer text-center">
+				Estimations are based on the current Salary price $ {this.PRICE}
+			</div> */}
+		</div>
+	</div>
+</div>
+
+
 
                     <div class="overlay toggle-menu"></div>
 
